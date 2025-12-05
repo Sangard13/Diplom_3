@@ -1,9 +1,9 @@
 import pytest
 import allure
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.firefox.service import Service as FirefoxService
 import sys
 import os
 
@@ -58,7 +58,6 @@ def pytest_addoption(parser):
         default=DEFAULT_TEST_USER['password'],
         help="Пароль тестового пользователя"
     )
-
 
 @pytest.fixture(scope="function")
 def test_user(request):
@@ -126,10 +125,10 @@ def authorized_user(driver, base_url, test_user):
         return main_page
 
 
-@pytest.fixture
+@pytest.fixture(params=["chrome", "firefox"])
 def browser(request):
-    """Фикстура выбора браузера"""
-    return request.config.getoption("--browser")
+    """Фикстура выбора браузера с параметризацией"""
+    return request.param
 
 
 @pytest.fixture
@@ -155,7 +154,7 @@ def driver(browser, headless, base_url):
 
     try:
         if browser.lower() == "chrome":
-            options = Options()
+            options = ChromeOptions()
 
             if headless:
                 options.add_argument("--headless=new")
@@ -183,8 +182,44 @@ def driver(browser, headless, base_url):
 
             driver_instance = webdriver.Chrome(options=options)
 
+        elif browser.lower() in ["firefox", "mozilla"]:
+            options = FirefoxOptions()
+
+            if headless:
+                options.add_argument("--headless")
+
+            # Настройки Firefox
+            options.set_preference("intl.accept_languages", "ru")
+            options.set_preference("dom.webnotifications.enabled", False)
+            options.set_preference("media.volume_scale", "0.0")
+
+            # Указываем путь к geckodriver (у вас он в C:\WebDriver\WebDriver.Mozilla\)
+            geckodriver_path = r"C:\WebDriver\WebDriver.Mozilla\geckodriver.exe"
+
+            print(f"[INFO] Путь к geckodriver: {geckodriver_path}")
+            print(f"[INFO] Файл существует: {os.path.exists(geckodriver_path)}")
+
+            if os.path.exists(geckodriver_path):
+                print(f"[INFO] Используется geckodriver по пути: {geckodriver_path}")
+                service = FirefoxService(executable_path=geckodriver_path)
+                driver_instance = webdriver.Firefox(service=service, options=options)
+            else:
+                print("[WARNING] Geckodriver не найден по указанному пути")
+                print("[INFO] Пробую найти geckodriver в PATH или установить автоматически...")
+
+                # Пробуем установить через webdriver-manager если не найден
+                try:
+                    from webdriver_manager.firefox import GeckoDriverManager
+                    print("[INFO] Установка geckodriver через webdriver-manager...")
+                    service = FirefoxService(GeckoDriverManager().install())
+                    driver_instance = webdriver.Firefox(service=service, options=options)
+                except Exception as wdm_error:
+                    print(f"[WARNING] Ошибка webdriver-manager: {wdm_error}")
+                    print("[INFO] Пробую запустить Firefox без service...")
+                    driver_instance = webdriver.Firefox(options=options)
+
         else:
-            raise ValueError(f"Браузер {browser} не поддерживается")
+            raise ValueError(f"Браузер {browser} не поддерживается. Используйте 'chrome' или 'firefox'")
 
         # Общие настройки
         driver_instance.implicitly_wait(10)
@@ -197,6 +232,20 @@ def driver(browser, headless, base_url):
 
     except Exception as e:
         print(f"❌ Ошибка при создании драйвера {browser}: {e}")
+        print(f"Тип ошибки: {type(e).__name__}")
+
+        # Подробная диагностика для Firefox
+        if browser.lower() in ["firefox", "mozilla"]:
+            print("\n[ДИАГНОСТИКА FIREFOX]:")
+            print("1. Проверьте установлен ли Firefox:")
+            print("   - Откройте командную строку и введите 'firefox --version'")
+            print("2. Проверьте geckodriver:")
+            print(f"   - Путь: {geckodriver_path}")
+            print("   - Скачайте с https://github.com/mozilla/geckodriver/releases")
+            print("3. Альтернатива: установите webdriver-manager")
+            print("   - pip install webdriver-manager")
+            print("4. Быстрое решение: используйте Chrome")
+            print("   - pytest --browser=chrome ...")
         raise e
 
     yield driver_instance
@@ -269,7 +318,7 @@ def pytest_runtest_makereport(item, call):
                         screenshot = driver_fixture.get_screenshot_as_png()
                         allure.attach(
                             screenshot,
-                            name="screenshot_on_failure",
+                            name=f"screenshot_{item.name}",
                             attachment_type=allure.attachment_type.PNG
                         )
 

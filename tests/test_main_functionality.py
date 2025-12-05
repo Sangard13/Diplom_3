@@ -2,6 +2,7 @@ import allure
 import pytest
 import time
 from selenium.webdriver.common.by import By
+from pages.ingredient_modal import IngredientModal
 from selenium.webdriver.common.keys import Keys
 
 
@@ -13,7 +14,7 @@ class TestMainFunctionality:
     @allure.title("1. Переход по клику на «Конструктор»")
     @pytest.mark.smoke
     def test_navigate_to_constructor(self, driver, main_page):
-        """Упрощенный тест перехода в конструктор"""
+        """Тест перехода в конструктор"""
         with allure.step("Открыть главную страницу"):
             main_page.open_main_page()
             time.sleep(3)
@@ -95,51 +96,40 @@ class TestMainFunctionality:
             # Не строго проверяем, просто логируем
             print(f"Модальное окно {'найдено' if modal_found else 'не найдено'}")
 
-    @allure.title("4. Всплывающее окно закрывается кликом по крестику")
-    def test_close_ingredient_modal_with_x(self, driver, main_page):
-        """Упрощенный тест закрытия модального окна"""
-        with allure.step("Открыть главную страницу"):
-            main_page.open_main_page()
-            time.sleep(3)
+    allure.title("4. Всплывающее окно закрывается кликом по крестику")
 
-        with allure.step("Открыть модальное окно (если возможно)"):
-            # Пробуем открыть модальное окно
-            clickables = driver.find_elements(By.CSS_SELECTOR, "div, a, button")
-            modal_opened = False
+    @allure.description(
+        "Проверка закрытия модального окна при клике на кнопку закрытия"
+    )
+    def test_close_ingredient_modal_with_x(self, driver, main_page,
+                                           ingredient_modal):  # Добавьте ingredient_modal в параметры
+        """
+        Тест проверяет закрытие модального окна при клике на крестик
+        1. Открываем главную страницу
+        2. Кликаем на ингредиент для открытия модального окна
+        3. Кликаем на крестик для закрытия
+        4. Проверяем, что модальное окно закрылось
+        """
+        # ingredient_modal уже инициализирован через фикстуру, не нужно создавать
 
-            for element in clickables[:15]:
-                try:
-                    if element.is_displayed():
-                        element.click()
-                        time.sleep(1)
+        # Открываем главную страницу
+        main_page.open_main_page()
+        time.sleep(2)  # Даем время для загрузки
 
-                        # Проверяем, открылось ли модальное окно
-                        modals = driver.find_elements(By.CSS_SELECTOR, "[class*='modal']")
-                        if any(modal.is_displayed() for modal in modals):
-                            modal_opened = True
-                            break
-                except:
-                    continue
+        # Открываем модальное окно
+        main_page.click_first_ingredient()
 
-            if not modal_opened:
-                pytest.skip("Не удалось открыть модальное окно")
+        # Ждем открытия модального окна
+        time.sleep(2)
 
-        with allure.step("Закрыть модальное окно"):
-            # Ищем кнопку закрытия
-            close_buttons = driver.find_elements(By.CSS_SELECTOR, "[class*='close'], button")
+        # Проверяем, что модальное окно открылось
+        assert ingredient_modal.is_modal_opened(), "Модальное окно не открылось"
 
-            for button in close_buttons:
-                try:
-                    if button.is_displayed():
-                        button.click()
-                        time.sleep(1)
-                        break
-                except:
-                    continue
+        # Закрываем модальное окно кликом по крестику
+        ingredient_modal.click_close_button()
 
-            # Или используем Escape
-            driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
-            time.sleep(1)
+        # Проверяем, что модальное окно закрылось
+        assert ingredient_modal.is_modal_closed(), "Модальное окно не закрылось после клика на крестик"
 
     @allure.title("5. Счетчик ингредиента увеличивается при добавлении")
     def test_ingredient_counter_increases(self, driver, main_page):

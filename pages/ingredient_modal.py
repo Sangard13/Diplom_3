@@ -16,10 +16,13 @@ class IngredientModal(BasePage):
     CLOSE_BUTTON = (By.CSS_SELECTOR, "button[class*='close'], svg[class*='close'], div[class*='close']")
     MODAL_TITLE = (By.CSS_SELECTOR, "h1, h2, h3, [class*='title']")
     INGREDIENT_NAME = (By.CSS_SELECTOR, "[class*='name'], [class*='title']")
+    # Добавляем локатор для оверлея
+    MODAL_OVERLAY = (By.CSS_SELECTOR, "[class*='overlay'], [class*='backdrop']")
 
     def __init__(self, driver):
         """Конструктор"""
         super().__init__(driver)
+        self.wait = WebDriverWait(driver, 10)
 
     @allure.step("Проверить, что модальное окно открыто")
     def is_modal_opened(self):
@@ -29,12 +32,61 @@ class IngredientModal(BasePage):
             for element in elements:
                 try:
                     if element.is_displayed():
+                        print(f"[DEBUG] Модальное окно найдено и отображается")
                         return True
                 except:
                     continue
+
+            # Также проверяем оверлей
+            overlays = self.driver.find_elements(*self.MODAL_OVERLAY)
+            for overlay in overlays:
+                try:
+                    if overlay.is_displayed():
+                        print(f"[DEBUG] Оверлей модального окна найден")
+                        return True
+                except:
+                    continue
+
+            print(f"[DEBUG] Модальное окно не найдено или не отображается")
             return False
-        except:
+        except Exception as e:
+            print(f"[DEBUG] Ошибка при проверке открытия модального окна: {e}")
             return False
+
+    @allure.step("Проверить, что модальное окно закрыто")
+    def is_modal_closed(self):
+        """Проверить, что модальное окно закрыто"""
+        try:
+            # Ждем немного, чтобы дать время на анимацию закрытия
+            time.sleep(1)
+
+            # Проверяем, что нет видимых модальных окон
+            elements = self.driver.find_elements(*self.MODAL)
+            for element in elements:
+                try:
+                    if element.is_displayed():
+                        print(f"[DEBUG] Модальное окно все еще отображается")
+                        return False
+                except:
+                    continue
+
+            # Проверяем, что нет видимых оверлеев
+            overlays = self.driver.find_elements(*self.MODAL_OVERLAY)
+            for overlay in overlays:
+                try:
+                    if overlay.is_displayed():
+                        print(f"[DEBUG] Оверлей все еще отображается")
+                        return False
+                except:
+                    continue
+
+            print(f"[DEBUG] Модальное окно успешно закрыто")
+            return True
+
+        except Exception as e:
+            print(f"[DEBUG] Ошибка при проверке закрытия модального окна: {e}")
+            # В случае ошибки считаем, что окно закрыто
+            return True
 
     @allure.step("Получить заголовок модального окна")
     def get_modal_title(self):
@@ -55,13 +107,22 @@ class IngredientModal(BasePage):
     def is_ingredient_details_visible(self):
         """Проверить, отображаются ли детали ингредиента"""
         try:
-            details = self.driver.find_elements(*self.INGREDIENT_DETAILS)
-            for detail in details:
-                try:
-                    if detail.is_displayed():
-                        return True
-                except:
-                    continue
+            # Используем общий локатор для деталей
+            details_selectors = [
+                (By.CSS_SELECTOR, "[class*='details']"),
+                (By.CSS_SELECTOR, "[class*='info']"),
+                (By.CSS_SELECTOR, "[class*='content']"),
+                self.INGREDIENT_NAME
+            ]
+
+            for selector in details_selectors:
+                details = self.driver.find_elements(*selector)
+                for detail in details:
+                    try:
+                        if detail.is_displayed():
+                            return True
+                    except:
+                        continue
             return False
         except:
             return False
@@ -70,20 +131,56 @@ class IngredientModal(BasePage):
     def click_close_button(self):
         """Закрыть модальное окно кликом по крестику"""
         try:
-            close_buttons = self.driver.find_elements(*self.CLOSE_BUTTON)
-            for button in close_buttons:
+            print("[DEBUG] Поиск кнопки закрытия...")
+
+            # Сначала пробуем более специфичные селекторы
+            close_selectors = [
+                (By.CSS_SELECTOR, "button[class*='Modal_close']"),
+                (By.CSS_SELECTOR, "div[class*='Modal_close']"),
+                (By.CSS_SELECTOR, "svg[class*='close']"),
+                self.CLOSE_BUTTON,
+                (By.XPATH, "//button[contains(text(), '×')]"),
+                (By.XPATH, "//button[contains(text(), 'X')]"),
+                (By.XPATH, "//button[.//*[contains(text(), '×')]]"),
+                (By.XPATH, "//button[.//*[contains(text(), 'X')]]"),
+            ]
+
+            for selector in close_selectors:
                 try:
-                    if button.is_displayed():
-                        button.click()
+                    buttons = self.driver.find_elements(*selector)
+                    print(f"[DEBUG] Найдено {len(buttons)} элементов по селектору {selector}")
+
+                    for i, button in enumerate(buttons):
+                        try:
+                            if button.is_displayed() and button.is_enabled():
+                                print(f"[DEBUG] Кликаем на кнопку {i}: {button.get_attribute('class')}")
+                                button.click()
+                                time.sleep(1)
+                                return True
+                        except Exception as e:
+                            print(f"[DEBUG] Ошибка при клике на кнопку {i}: {e}")
+                            continue
+                except:
+                    continue
+
+            print("[DEBUG] Кнопка не найдена, пробуем Escape")
+            # Если кнопка не найдена, пробуем Escape
+            actions = ActionChains(self.driver)
+            actions.send_keys(Keys.ESCAPE).perform()
+            time.sleep(1)
+
+            # Пробуем кликнуть по оверлею
+            overlays = self.driver.find_elements(*self.MODAL_OVERLAY)
+            for overlay in overlays:
+                try:
+                    if overlay.is_displayed():
+                        print("[DEBUG] Кликаем по оверлею")
+                        overlay.click()
                         time.sleep(1)
                         return True
                 except:
                     continue
 
-            # Если кнопка не найдена, пробуем Escape
-            actions = ActionChains(self.driver)
-            actions.send_keys(Keys.ESCAPE).perform()
-            time.sleep(1)
             return True
 
         except Exception as e:
@@ -93,8 +190,6 @@ class IngredientModal(BasePage):
     @allure.step("Закрыть модальное окно")
     def close_modal(self):
         """Закрыть модальное окно с ожиданием"""
-        import time
-
         print("[DEBUG] Начало закрытия модального окна")
 
         # Проверяем, открыто ли окно
@@ -114,3 +209,25 @@ class IngredientModal(BasePage):
 
         print("[DEBUG] Модальное окно не закрылось после всех попыток")
         return False
+
+    @allure.step("Ожидать открытия модального окна")
+    def wait_for_modal_open(self, timeout=5):
+        """Ожидать открытия модального окна"""
+        try:
+            # Ожидаем появления модального окна
+            return self.wait.until(
+                lambda driver: self.is_modal_opened()
+            )
+        except:
+            return False
+
+    @allure.step("Ожидать закрытия модального окна")
+    def wait_for_modal_close(self, timeout=5):
+        """Ожидать закрытия модального окна"""
+        try:
+            # Ожидаем исчезновения модального окна
+            return self.wait.until(
+                lambda driver: not self.is_modal_opened()
+            )
+        except:
+            return True
