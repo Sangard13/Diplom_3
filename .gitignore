@@ -1,0 +1,17 @@
+reports/
+allure-results*/
+screenshots/
+logs/
+*.log
+test-results/
+
+# Драйверы браузеров
+chromedriver*
+geckodriver*
+
+# Конфиденциальные данные
+*.env
+config.local.py
+
+# Отчеты
+report*.html
