@@ -168,7 +168,6 @@ class BasePage:
         """Выполнить JavaScript код"""
         return self.driver.execute_script(script, *args)
 
-    # ДОБАВЛЕННЫЕ МЕТОДЫ
 
     @allure.step("Найти элемент (старый формат)")
     def find_element_by(self, by, value, timeout=10):

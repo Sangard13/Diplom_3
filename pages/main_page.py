@@ -22,7 +22,7 @@ class MainPage(BasePage):
             lambda d: d.execute_script("return document.readyState") == "complete",
             timeout=timeout
         )
-        # Дополнительно ждем появления заголовка или ингредиента
+        # Ждем появления заголовка или ингредиента
         if self.is_element_visible(MainPageLocators.BURGER_TITLE, timeout=5):
             return True
         elif self.is_element_visible(MainPageLocators.INGREDIENT_CARD, timeout=5):
@@ -146,7 +146,6 @@ class MainPage(BasePage):
         self.click_element(MainPageLocators.MODAL_CLOSE_BUTTON)
         self.wait_for_element_to_disappear(MainPageLocators.MODAL_CONTENT)
 
-    # НОВЫЕ МЕТОДЫ
 
     @allure.step("Получить первый доступный ингредиент")
     def get_first_available_ingredient(self):
@@ -223,7 +222,6 @@ class MainPage(BasePage):
     def wait_for_element_to_update(self, element, timeout=3):
         """Ожидает обновления элемента (например, счетчика)"""
         try:
-            # Ждем небольшую паузу для обновления DOM
             import time
             time.sleep(1)
 
@@ -233,7 +231,6 @@ class MainPage(BasePage):
                 lambda d: element.get_attribute("class") != initial_class
             )
         except:
-            # Просто ждем 1 секунду, если не удалось дождаться изменений
             import time
             time.sleep(1)
 

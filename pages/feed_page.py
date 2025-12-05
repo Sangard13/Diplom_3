@@ -12,7 +12,7 @@ class FeedPage(BasePage):
     @allure.step("Открыть страницу ленты заказов")
     def open_feed_page(self):
         """Открывает страницу ленты заказов"""
-        # Используйте URL из конфигурации вместо хардкода
+        # Используем URL из конфигурации вместо хардкода
         self.open(PAGES["feed"])
         self.wait_for_page_load()
 
@@ -23,12 +23,12 @@ class FeedPage(BasePage):
             lambda d: d.execute_script("return document.readyState") == "complete",
             timeout=timeout
         )
-        # Дополнительно ждем появления элементов ленты заказов
+        # Ждем появления элементов ленты заказов
         try:
             self.wait_for_element_to_be_visible(FeedPageLocators.ORDERS_LIST, timeout=5)
             return True
         except:
-            # Проверяем альтернативные элементы
+            # Проверяем элементы
             if (self.is_element_visible(FeedPageLocators.TOTAL_ORDERS, timeout=3) or
                     self.is_element_visible(FeedPageLocators.TODAY_ORDERS, timeout=3)):
                 return True

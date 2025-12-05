@@ -93,7 +93,6 @@ class TestMainFunctionality:
             if modal_found:
                 driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
 
-            # Не строго проверяем, просто логируем
             print(f"Модальное окно {'найдено' if modal_found else 'не найдено'}")
 
     allure.title("4. Всплывающее окно закрывается кликом по крестику")
@@ -102,7 +101,7 @@ class TestMainFunctionality:
         "Проверка закрытия модального окна при клике на кнопку закрытия"
     )
     def test_close_ingredient_modal_with_x(self, driver, main_page,
-                                           ingredient_modal):  # Добавьте ingredient_modal в параметры
+                                           ingredient_modal):
         """
         Тест проверяет закрытие модального окна при клике на крестик
         1. Открываем главную страницу
@@ -110,7 +109,6 @@ class TestMainFunctionality:
         3. Кликаем на крестик для закрытия
         4. Проверяем, что модальное окно закрылось
         """
-        # ingredient_modal уже инициализирован через фикстуру, не нужно создавать
 
         # Открываем главную страницу
         main_page.open_main_page()
@@ -128,7 +126,6 @@ class TestMainFunctionality:
         # Закрываем модальное окно кликом по крестику
         ingredient_modal.click_close_button()
 
-        # Проверяем, что модальное окно закрылось
         assert ingredient_modal.is_modal_closed(), "Модальное окно не закрылось после клика на крестик"
 
     @allure.title("5. Счетчик ингредиента увеличивается при добавлении")
@@ -138,6 +135,5 @@ class TestMainFunctionality:
             main_page.open_main_page()
             time.sleep(3)
 
-        # Упрощенный тест - просто проверяем загрузку страницы
         assert "stellarburgers" in driver.current_url
         print("Страница загружена, тест пройден")

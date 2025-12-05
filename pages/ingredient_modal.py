@@ -200,7 +200,7 @@ class IngredientModal(BasePage):
         # Закрываем окно
         self.click_close_button()
 
-        # Ждем закрытия (до 5 секунд)
+        # Ждем закрытия
         for i in range(10):
             time.sleep(0.5)
             if not self.is_modal_opened():
