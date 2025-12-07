@@ -14,4 +14,4 @@ geckodriver*
 config.local.py
 
 # Отчеты
-report*.html
+report*.html".idea/" 
