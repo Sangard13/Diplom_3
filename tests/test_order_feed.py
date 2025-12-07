@@ -21,7 +21,7 @@ class TestOrderFeed:
             assert "/feed" in driver.current_url
 
         with allure.step("Проверить счетчик (упрощенно)"):
-            # Просто проверяем, что страница загрузилась
+            # Проверяем, что страница загрузилась
             page_text = driver.page_source.lower()
             has_orders_text = any(word in page_text for word in ["выполнено", "заказ", "order"])
             print(f"Текст 'выполнено' найден: {has_orders_text}")
@@ -31,7 +31,7 @@ class TestOrderFeed:
 
     @allure.title("7. Счётчик 'Выполнено за сегодня' отображается")
     def test_today_counter_displayed(self, driver, feed_page):
-        """Упрощенный тест отображения счетчика"""
+        """Тест отображения счетчика"""
         with allure.step("Открыть ленту заказов"):
             feed_page.open()
             time.sleep(3)
@@ -42,7 +42,7 @@ class TestOrderFeed:
 
     @allure.title("8. Раздел 'В работе' отображается")
     def test_orders_in_progress_displayed(self, driver, feed_page):
-        """Упрощенный тест отображения раздела"""
+        """Тест отображения раздела"""
         with allure.step("Открыть ленту заказов"):
             feed_page.open()
             time.sleep(3)

@@ -3,11 +3,14 @@ from pages.base_page import BasePage
 from locators.main_page_locators import MainPageLocators
 from config import PAGES
 from selenium.webdriver.common.by import By
-from selenium.webdriver import ActionChains
 
 
 class MainPage(BasePage):
     """Класс для работы с главной страницей (конструктор)"""
+
+    def __init__(self, driver):
+        """Конструктор"""
+        super().__init__(driver)
 
     @allure.step("Открыть главную страницу")
     def open_main_page(self):
@@ -18,16 +21,16 @@ class MainPage(BasePage):
     @allure.step("Ожидать загрузки страницы")
     def wait_for_page_load(self, timeout=10):
         """Ждать полной загрузки страницы"""
-        self.wait_for_custom_condition(
-            lambda d: d.execute_script("return document.readyState") == "complete",
-            timeout=timeout
-        )
-        # Ждем появления заголовка или ингредиента
-        if self.is_element_visible(MainPageLocators.BURGER_TITLE, timeout=5):
-            return True
-        elif self.is_element_visible(MainPageLocators.INGREDIENT_CARD, timeout=5):
-            return True
-        return True
+        try:
+            # Используем метод из BasePage
+            return self.wait_for_document_ready(timeout=timeout)
+        except Exception as e:
+            self.logger.error(f"Ошибка при ожидании загрузки страницы: {e}")
+            return False
+
+        except Exception as e:
+            self.logger.error(f"Ошибка при ожидании загрузки страницы: {e}")
+            return False
 
     @allure.step("Кликнуть на вкладку 'Конструктор'")
     def click_constructor_tab(self):
@@ -42,21 +45,41 @@ class MainPage(BasePage):
     @allure.step("Проверить, что находимся на главной странице")
     def is_on_main_page(self):
         """Проверить, что находимся на главной странице"""
-        return self.is_element_visible(MainPageLocators.BURGER_TITLE)
+        try:
+            # Проверяем URL
+            if not self.wait_for_url_contains("stellarburgers", timeout=5):
+                return False
+
+            # Проверяем наличие заголовка
+            return self.is_element_visible(MainPageLocators.BURGER_TITLE, timeout=5)
+
+        except Exception as e:
+            self.logger.error(f"Ошибка при проверке главной страницы: {e}")
+            return False
 
     @allure.step("Получить список ингредиентов")
     def get_ingredients(self):
         """Получить все доступные ингредиенты"""
-        return self.find_elements(MainPageLocators.INGREDIENT_CARD)
+        try:
+            return self.wait_for_elements_present(MainPageLocators.INGREDIENT_CARD, timeout=10)
+        except Exception as e:
+            self.logger.error(f"Ошибка при получении списка ингредиентов: {e}")
+            return []
 
     @allure.step("Кликнуть на первый ингредиент")
     def click_first_ingredient(self):
         """Кликнуть на первый ингредиент"""
-        ingredients = self.get_ingredients()
-        if ingredients:
-            ingredients[0].click()
-            return True
-        return False
+        try:
+            ingredients = self.get_ingredients()
+            if ingredients:
+                first_ingredient = self.wait_for_element_clickable(ingredients[0], timeout=10)
+                first_ingredient.click()
+                return True
+            return False
+
+        except Exception as e:
+            self.logger.error(f"Ошибка при клике на первый ингредиент: {e}")
+            return False
 
     @allure.step("Получить значение счетчика ингредиента")
     def get_ingredient_counter(self, ingredient_element=None):
@@ -70,15 +93,19 @@ class MainPage(BasePage):
 
         try:
             # Ищем счетчик внутри элемента ингредиента
-            counter_elements = ingredient_element.find_elements(*MainPageLocators.INGREDIENT_COUNTER)
-            if counter_elements and counter_elements[0].is_displayed():
+            counter_locator = (By.CSS_SELECTOR, "[class*='counter']")
+            counter_elements = self.find_elements_within_element(ingredient_element, counter_locator)
+
+            if counter_elements and self.is_element_visible_in_parent(counter_elements[0], ingredient_element):
                 counter_text = counter_elements[0].text.strip()
                 # Извлекаем число из текста
                 import re
                 numbers = re.findall(r'\d+', counter_text)
                 return int(numbers[0]) if numbers else 0
-        except:
-            pass
+
+        except Exception as e:
+            self.logger.debug(f"Счетчик не найден: {e}")
+
         return 0
 
     @allure.step("Перетащить ингредиент в конструктор")
@@ -88,175 +115,200 @@ class MainPage(BasePage):
             if ingredient_element is None:
                 # Используем стандартное перетаскивание
                 if use_js:
-                    self.drag_and_drop_js(
+                    return self.drag_and_drop_js(
                         MainPageLocators.INGREDIENT_CARD,
                         MainPageLocators.DROP_AREA
                     )
                 else:
-                    self.drag_and_drop(
+                    return self.drag_and_drop(
                         MainPageLocators.INGREDIENT_CARD,
                         MainPageLocators.DROP_AREA
                     )
             else:
                 # Перетаскиваем конкретный элемент ингредиента
                 return self._drag_specific_ingredient(ingredient_element)
-            return True
+
         except Exception as e:
-            print(f"Ошибка при перетаскивании: {e}")
+            self.logger.error(f"Ошибка при перетаскивании: {e}")
             return False
 
     def _drag_specific_ingredient(self, ingredient_element):
         """Перетаскивает конкретный элемент ингредиента в конструктор"""
         try:
             # Находим область конструктора
-            drop_area = self.find_element(MainPageLocators.DROP_AREA)
+            drop_area = self.wait_for_element_present(MainPageLocators.DROP_AREA, timeout=10)
 
-            # Используем ActionChains для перетаскивания
-            actions = ActionChains(self.driver)
-            actions.click_and_hold(ingredient_element) \
-                .move_to_element(drop_area) \
-                .release(drop_area) \
-                .perform()
-            return True
+            # Используем метод drag_and_drop_element из BasePage
+            return self.drag_and_drop_element(ingredient_element, drop_area)
+
         except Exception as e:
-            print(f"Ошибка при перетаскивании конкретного ингредиента: {e}")
+            self.logger.error(f"Ошибка при перетаскивании конкретного ингредиента: {e}")
             return False
 
     @allure.step("Проверить наличие ингредиентов в конструкторе")
     def has_ingredients_in_constructor(self):
         """Проверить, есть ли ингредиенты в конструкторе"""
-        return self.is_element_visible(MainPageLocators.CONSTRUCTOR_ITEMS)
+        return self.is_element_visible(MainPageLocators.CONSTRUCTOR_ITEMS, timeout=5)
 
     @allure.step("Проверить открыто ли модальное окно ингредиента")
     def is_ingredient_modal_opened(self):
         """Проверить, открыто ли модальное окно с деталями ингредиента"""
-        return self.is_element_visible(MainPageLocators.MODAL_CONTENT)
+        return self.is_element_visible(MainPageLocators.MODAL_CONTENT, timeout=5)
 
     @allure.step("Получить заголовок модального окна ингредиента")
     def get_ingredient_modal_title(self):
         """Получить заголовок модального окна с деталями ингредиента"""
         try:
-            return self.get_text(MainPageLocators.MODAL_TITLE)
-        except:
+            element = self.wait_for_element_visible(MainPageLocators.MODAL_TITLE, timeout=5)
+            return element.text.strip()
+        except Exception as e:
+            self.logger.error(f"Ошибка при получении заголовка модального окна: {e}")
             return ""
 
     @allure.step("Закрыть модальное окно ингредиента")
     def close_ingredient_modal(self):
         """Закрыть модальное окно с деталями ингредиента"""
-        self.click_element(MainPageLocators.MODAL_CLOSE_BUTTON)
-        self.wait_for_element_to_disappear(MainPageLocators.MODAL_CONTENT)
-
+        try:
+            self.click_element(MainPageLocators.MODAL_CLOSE_BUTTON)
+            self.wait_for_element_to_disappear(MainPageLocators.MODAL_CONTENT, timeout=5)
+            return True
+        except Exception as e:
+            self.logger.error(f"Ошибка при закрытии модального окна: {e}")
+            return False
 
     @allure.step("Получить первый доступный ингредиент")
     def get_first_available_ingredient(self):
         """Находит первый доступный ингредиент"""
-        # Проверяем, есть ли уже элементы на странице
-        if not self.is_element_visible(MainPageLocators.INGREDIENT_CARD, timeout=5):
-            self.wait_for_page_load()
-
-        ingredients = self.get_ingredients()
-        if ingredients:
-            return ingredients[0]
-
-        # Альтернативный поиск, если стандартный локатор не работает
         try:
-            return self.find_element((By.CSS_SELECTOR, "[class*='BurgerIngredient_ingredient']"))
-        except:
-            # Еще одна попытка с другим селектором
-            return self.find_element((By.CSS_SELECTOR, "[class*='ingredient']"))
+            # Проверяем, есть ли уже элементы на странице
+            if not self.is_element_visible(MainPageLocators.INGREDIENT_CARD, timeout=5):
+                self.wait_for_page_load()
+
+            ingredients = self.get_ingredients()
+            if ingredients:
+                return ingredients[0]
+
+            # Альтернативный поиск, если стандартный локатор не работает
+            alternative_selectors = [
+                (By.CSS_SELECTOR, "[class*='BurgerIngredient_ingredient']"),
+                (By.CSS_SELECTOR, "[class*='ingredient']"),
+                (By.CSS_SELECTOR, "section a"),
+                (By.CSS_SELECTOR, "section div[class*='card']")
+            ]
+
+            for selector in alternative_selectors:
+                try:
+                    element = self.wait_for_element_present(selector, timeout=2)
+                    if element:
+                        return element
+                except:
+                    continue
+
+            return None
+
+        except Exception as e:
+            self.logger.error(f"Ошибка при поиске первого ингредиента: {e}")
+            return None
 
     @allure.step("Получить счетчик ингредиента из элемента")
     def get_ingredient_counter_from_element(self, ingredient_element):
         """Получает значение счетчика ингредиента из конкретного элемента"""
         try:
             # Пробуем найти счетчик внутри элемента
-            counter_element = ingredient_element.find_element(By.CSS_SELECTOR, "[class*='counter__num']")
-            if counter_element and counter_element.is_displayed():
-                counter_text = counter_element.text.strip()
-                if counter_text:
-                    return int(counter_text)
-        except:
-            pass
+            counter_locator = (By.CSS_SELECTOR, "[class*='counter__num'], [class*='counter']")
+            counter_elements = self.find_elements_within_element(ingredient_element, counter_locator)
 
-        # Альтернативный поиск
-        try:
-            # Ищем счетчик по другому классу
-            counter_element = ingredient_element.find_element(By.XPATH,
-                                                              ".//*[contains(@class, 'counter')]//*[contains(text(), '1') or contains(text(), '2') or contains(text(), '3')]")
-            if counter_element:
-                return int(counter_element.text.strip())
-        except:
-            pass
+            for element in counter_elements:
+                if element.is_displayed():
+                    counter_text = element.text.strip()
+                    if counter_text:
+                        numbers = re.findall(r'\d+', counter_text)
+                        return int(numbers[0]) if numbers else 0
 
-        return 0
+            return 0
+
+        except Exception as e:
+            self.logger.debug(f"Счетчик не найден в элементе: {e}")
+            return 0
 
     @allure.step("Добавить ингредиент в конструктор")
     def add_ingredient_to_constructor(self, ingredient_element=None):
         """Добавляет ингредиент в конструктор и возвращает результат"""
-        if ingredient_element is None:
-            ingredient_element = self.get_first_available_ingredient()
-
-        # Получаем счетчик до добавления
-        counter_before = self.get_ingredient_counter_from_element(ingredient_element)
-
-        # Добавляем ингредиент
-        success = self._drag_specific_ingredient(ingredient_element)
-
-        if success:
-            # Ждем обновления интерфейса
-            self.wait_for_element_to_update(ingredient_element)
-
-            # Получаем счетчик после добавления
-            counter_after = self.get_ingredient_counter_from_element(ingredient_element)
-
-            return {
-                'success': True,
-                'counter_before': counter_before,
-                'counter_after': counter_after,
-                'increased': counter_after > counter_before
-            }
-
-        return {'success': False}
-
-    @allure.step("Ожидать обновления элемента")
-    def wait_for_element_to_update(self, element, timeout=3):
-        """Ожидает обновления элемента (например, счетчика)"""
         try:
-            import time
-            time.sleep(1)
+            if ingredient_element is None:
+                ingredient_element = self.get_first_available_ingredient()
+                if not ingredient_element:
+                    return {'success': False, 'error': 'Ингредиент не найден'}
 
-            # Или ждем изменения класса/атрибута
-            initial_class = element.get_attribute("class")
-            WebDriverWait(self.driver, timeout).until(
-                lambda d: element.get_attribute("class") != initial_class
-            )
+            # Получаем счетчик до добавления
+            counter_before = self.get_ingredient_counter_from_element(ingredient_element)
+
+            # Добавляем ингредиент
+            success = self._drag_specific_ingredient(ingredient_element)
+
+            if success:
+                # Ждем обновления интерфейса
+                self.wait_for_counter_update(ingredient_element, counter_before)
+
+                # Получаем счетчик после добавления
+                counter_after = self.get_ingredient_counter_from_element(ingredient_element)
+
+                return {
+                    'success': True,
+                    'counter_before': counter_before,
+                    'counter_after': counter_after,
+                    'increased': counter_after > counter_before
+                }
+
+            return {'success': False, 'error': 'Не удалось перетащить ингредиент'}
+
+        except Exception as e:
+            self.logger.error(f"Ошибка при добавлении ингредиента: {e}")
+            return {'success': False, 'error': str(e)}
+
+    @allure.step("Ожидать обновления счетчика")
+    def wait_for_counter_update(self, element, initial_value, timeout=5):
+        """Ожидает обновления счетчика ингредиента"""
+
+        def counter_updated(driver):
+            current_value = self.get_ingredient_counter_from_element(element)
+            return current_value != initial_value
+
+        try:
+            return self.wait_for_condition(counter_updated, timeout=timeout)
         except:
-            import time
-            time.sleep(1)
+            return False
 
     @allure.step("Получить количество ингредиентов в конструкторе")
     def get_constructor_ingredients_count(self):
         """Получает количество ингредиентов в конструкторе"""
         try:
-            items = self.find_elements(MainPageLocators.CONSTRUCTOR_ITEMS)
+            items = self.wait_for_elements_present(MainPageLocators.CONSTRUCTOR_ITEMS, timeout=5)
             return len(items)
-        except:
+        except Exception as e:
+            self.logger.error(f"Ошибка при получении количества ингредиентов: {e}")
             return 0
 
     @allure.step("Очистить конструктор")
     def clear_constructor(self):
         """Удаляет все ингредиенты из конструктора"""
         try:
-            # Ищем кнопки удаления или закрытия для каждого ингредиента
-            delete_buttons = self.find_elements((By.CSS_SELECTOR, "[class*='constructor-element__action']"))
-            for button in delete_buttons:
-                try:
-                    button.click()
-                except:
-                    pass
+            # Ищем кнопки удаления
+            delete_locator = (By.CSS_SELECTOR, "[class*='constructor-element__action']")
+            delete_buttons = self.find_elements(delete_locator)
 
-            # Ждем очистки
+            for button in reversed(delete_buttons):  # Удаляем с конца
+                try:
+                    if button.is_displayed():
+                        button.click()
+                        self.wait_for_element_staleness(button, timeout=2)
+                except:
+                    continue
+
+            # Ждем очистки конструктора
             self.wait_for_element_to_disappear(MainPageLocators.CONSTRUCTOR_ITEMS, timeout=5)
             return True
-        except:
+
+        except Exception as e:
+            self.logger.error(f"Ошибка при очистке конструктора: {e}")
             return False
