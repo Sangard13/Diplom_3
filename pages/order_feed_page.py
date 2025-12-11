@@ -18,6 +18,20 @@ class OrderFeedPage(BasePage):
         """Открыть страницу ленты заказов"""
         super().open("/feed")
 
+    @allure.step("Дождаться загрузки страницы")
+    def wait_for_page_load(self, timeout=10):
+        """Ожидать загрузки страницы ленты заказов"""
+        WebDriverWait(self.driver, timeout).until(
+            lambda d: self.is_feed_page_loaded()
+        )
+
+    @allure.step("Дождаться URL содержащего '{text}'")
+    def wait_for_url_contains(self, text, timeout=10):
+        """Ожидать, что URL содержит определенный текст"""
+        WebDriverWait(self.driver, timeout).until(
+            EC.url_contains(text)
+        )
+
     @allure.step("Проверить загрузку страницы ленты заказов")
     def is_feed_page_loaded(self):
         """Проверить загрузку страницы ленты заказов"""

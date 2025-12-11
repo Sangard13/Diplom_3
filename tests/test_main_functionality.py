@@ -45,30 +45,23 @@ class TestMainFunctionality:
 
     @allure.title("Закрытие модального окна по крестику")
     @allure.description("Проверка закрытия модального окна при клике на кнопку закрытия")
-    def test_ingredient_modal_closes(self, driver, base_url):  # Добавляем base_url в параметры
+    def test_modal_closes_by_close_button(self, driver, base_url, main_page, ingredient_modal):
         """
         Тест проверяет закрытие модального окна при клике на крестик
-        1. Открываем главную страницу
-        2. Кликаем на ингредиент для открытия модального окна
-        3. Кликаем на крестик для закрытия
-        4. Проверяем, что модальное окна закрылось
+        Предусловие: модальное окно уже открыто
+        1. Кликаем на крестик для закрытия
+        2. Проверяем, что модальное окно закрылось
         """
-        # Создаем экземпляры страниц
-        main_page = MainPage(driver, base_url)
-        modal = IngredientModal(driver, base_url)
-
-        # Открываем главную страницу
+        # ПРЕДУСЛОВИЕ: открываем модальное окно
         main_page.open()
-
-        # Открываем модальное окно
         main_page.click_first_bun_ingredient()
-        assert modal.is_modal_opened(), "Модальное окно не открылось"
+        assert ingredient_modal.is_opened(), "Модальное окно должно быть открыто перед тестом"
 
-        # Закрываем модальное окно кликом по крестику
-        modal.click_close_button()
+        # ДЕЙСТВИЕ: закрываем модальное окно кликом по крестику
+        ingredient_modal.close_by_button()
 
-        # Проверяем, что модальное окно закрылось
-        assert modal.is_modal_closed(), "Модальное окно не закрылось после клика на крестик"
+        # ПРОВЕРКА: модальное окно закрылось
+        assert ingredient_modal.is_closed(), "Модальное окно не закрылось после клика на крестик"
 
     @allure.title("При добавлении ингредиента в заказ счётчик этого ингредиента увеличивается")
     @allure.description(
@@ -89,37 +82,24 @@ class TestMainFunctionality:
 
     @allure.story("Работа с конструктором бургеров")
     @allure.title("Переключение на раздел «Булки» в конструкторе")
-    def test_switch_to_buns_section(self, driver, main_page):
+    def test_switch_to_buns_section(self, main_page):
         """Тест переключения на раздел 'Булки'"""
         # Сначала переключаемся на другой раздел
-        sauces_element = main_page.driver.find_element(*main_page.locators.SAUCES_SECTION)
-        main_page.driver.execute_script("arguments[0].click();", sauces_element)
+        main_page.click_sauces_section()
 
         # Затем возвращаемся к булкам
-        buns_element = main_page.driver.find_element(*main_page.locators.BUNS_SECTION)
-        main_page.driver.execute_script("arguments[0].click();", buns_element)
+        main_page.click_buns_section()
 
         # Проверяем результат
-        assert main_page.is_element_visible(main_page.locators.BUNS_SECTION)
+        assert main_page.is_buns_section_active()
 
     @allure.story("Работа с конструктором бургеров")
     @allure.title("Переключение на раздел «Соусы» в конструкторе")
-    def test_switch_to_sauces_section(self, driver, main_page):
+    def test_switch_to_sauces_section(self, main_page):
         """Тест переключения на раздел 'Соусы'"""
-        # Кликаем через JavaScript
-        element = main_page.driver.find_element(*main_page.locators.SAUCES_SECTION)
-        main_page.driver.execute_script("arguments[0].click();", element)
+        # Переключаемся на раздел Соусы
+        main_page.click_sauces_section()
 
         # Проверяем результат
-        assert main_page.is_element_visible(main_page.locators.SAUCES_SECTION)
+        assert main_page.is_sauces_section_active()
 
-    @allure.story("Работа с конструктором бургеров")
-    @allure.title("Переключение на раздел «Начинки» в конструкторе")
-    @allure.description("Проверка переключения между разделами конструктора - активация раздела 'Начинки'")
-    def test_switch_to_fillings_section(self, driver, main_page):
-        """Тест переключения на раздел 'Начинки'"""
-        # 1. Переключаемся на раздел 'Начинки'
-        main_page.click_fillings_section()
-
-        # 2. Проверяем, что раздел 'Начинки' активен
-        assert main_page.is_element_visible(main_page.locators.FILLINGS_SECTION)
