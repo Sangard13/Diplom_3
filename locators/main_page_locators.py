@@ -5,8 +5,8 @@ class MainPageLocators:
     """Локаторы элементов главной страницы"""
 
     # Навигация в шапке
-    CONSTRUCTOR_TAB = (By.XPATH, "//a[contains(@class, 'AppHeader_header__link') and p[text()='Конструктор']]")
-    ORDER_FEED_TAB = (By.XPATH, "//a[contains(@class, 'AppHeader_header__link') and p[text()='Лента Заказов']]")
+    CONSTRUCTOR_BUTTON = (By.XPATH, "//a[contains(@class, 'AppHeader_header__link') and p[text()='Конструктор']]")
+    ORDER_FEED_BUTTON = (By.XPATH, "//a[contains(@class, 'AppHeader_header__link') and p[text()='Лента Заказов']]")
     PERSONAL_ACCOUNT_BUTTON = (By.XPATH,
                                "//a[contains(@class, 'AppHeader_header__link') and .//p[text()='Личный Кабинет']]")
 
@@ -18,16 +18,19 @@ class MainPageLocators:
     BURGER_TITLE = (By.XPATH, "//h1[contains(text(), 'Соберите бургер')]")
 
     # Табы конструктора
-    BUNS_TAB = (By.XPATH, "//div[contains(@class, 'tab_tab__') and .//span[text()='Булки']]")
-    SAUCES_TAB = (By.XPATH, "//div[contains(@class, 'tab_tab__') and .//span[text()='Соусы']]")
-    FILLINGS_TAB = (By.XPATH, "//div[contains(@class, 'tab_tab__') and .//span[text()='Начинки']]")
+    BUNS_SECTION = (By.XPATH, "//div[contains(@class, 'tab_tab__') and .//span[text()='Булки']]")
+    SAUCES_SECTION = (By.XPATH, "//div[contains(@class, 'tab_tab__') and .//span[text()='Соусы']]")
+    FILLINGS_SECTION = (By.XPATH, "//div[contains(@class, 'tab_tab__') and .//span[text()='Начинки']]")
 
     # Секции ингредиентов
-    BUNS_SECTION = (By.XPATH, "//h2[text()='Булки']")
-    SAUCES_SECTION = (By.XPATH, "//h2[text()='Соусы']")
-    FILLINGS_SECTION = (By.XPATH, "//h2[text()='Начинки']")
+    BUNS_SECTION_TITLE = (By.XPATH, "//h2[text()='Булки']")
+    SAUCES_SECTION_TITLE = (By.XPATH, "//h2[text()='Соусы']")
+    FILLINGS_SECTION_TITLE = (By.XPATH, "//h2[text()='Начинки']")
 
     # Ингредиенты
+    FIRST_BUN_INGREDIENT = (By.XPATH, "(//h2[text()='Булки']/following::a)[1]")
+    BUN_COUNTER = (By.XPATH, "(//h2[text()='Булки']/following::a[1]//div[contains(@class, 'counter')])[1]")
+    CONSTRUCTOR_DROP_AREA = (By.XPATH, "//section[contains(@class, 'BurgerConstructor_basket')]")
     INGREDIENT_CARD = (By.XPATH, "//div[contains(@class, 'BurgerIngredient_ingredient')]")
     INGREDIENT_NAME = (By.XPATH, ".//p[contains(@class, 'BurgerIngredient_name')]")
     INGREDIENT_PRICE = (By.XPATH, ".//p[contains(@class, 'BurgerIngredient_price__')]")
@@ -47,9 +50,3 @@ class MainPageLocators:
     MODAL_OVERLAY = (By.XPATH, "//div[contains(@class, 'Modal_modal_overlay__')]")
     MODAL_CONTENT = (By.XPATH, "//div[contains(@class, 'Modal_modal__')]")
     MODAL_TITLE = (By.XPATH, "//div[contains(@class, 'Modal_modal__')]//h3")
-
-    # Алиасы для совместимости
-    CONSTRUCTOR_BUTTON = CONSTRUCTOR_TAB
-    ORDER_FEED_BUTTON = ORDER_FEED_TAB
-    ORDER_FEED_BTN = ORDER_FEED_TAB
-    PLACE_ORDER_BUTTON = ORDER_BUTTON

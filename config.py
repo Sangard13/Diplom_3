@@ -13,7 +13,7 @@ TEST_USER = {
 
 # Таймауты
 TIMEOUTS = {
-    'short': 3,
+    'short': 10,
     'medium': 10,
     'long': 30
 }

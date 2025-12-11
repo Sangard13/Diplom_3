@@ -11,7 +11,7 @@ class FeedPageLocators:
     TOTAL_ORDERS_COUNTER = (By.XPATH, "//p[contains(text(), 'Выполнено за все время')]/following-sibling::p")
     TODAY_ORDERS_COUNTER = (By.XPATH, "//p[contains(text(), 'Выполнено за сегодня')]/following-sibling::p")
 
-    # Номер заказа в списке заказов (шаблон)
+    # Номер заказа в списке заказов
     @staticmethod
     def order_number(order_num):
         """Шаблон для поиска номера заказа"""

@@ -4,7 +4,8 @@ screenshots/
 logs/
 *.log
 test-results/
-
+__pycache__/
+.pyc
 # Драйверы браузеров
 chromedriver*
 geckodriver*
@@ -15,3 +16,4 @@ config.local.py
 
 # Отчеты
 report*.html".idea/" 
+".idea/" 

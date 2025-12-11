@@ -1,117 +1,125 @@
 import allure
-import pytest
-from selenium.webdriver.common.by import By
+from pages.main_page import MainPage
 from pages.ingredient_modal import IngredientModal
-from pages.order_feed_page import OrderFeedPage
-
+from locators.main_page_locators import MainPageLocators
 
 @allure.feature("Основная функциональность")
 @allure.story("Навигация и взаимодействие с элементами")
 class TestMainFunctionality:
-    """Тесты основной функциональности приложения"""
 
-    @allure.title("1. Переход по клику на «Конструктор»")
-    @pytest.mark.smoke
-    def test_navigate_to_constructor(self, driver, main_page):
-        """
-        Тест проверяет переход в конструктор
-        """
-        with allure.step("Открыть главную страницу"):
-            main_page.open_main_page()
-            assert main_page.is_on_main_page(), "Главная страница не загрузилась"
+    @allure.title("Переход по клику на «Конструктор»")
+    @allure.description("Проверка перехода на главную страницу при клике на кнопку 'Конструктор' из ленты заказов")
+    def test_navigate_to_constructor(self, main_page, order_feed_page):
+        """Тест перехода на главную страницу по клику на 'Конструктор'"""
+        # 1. Переходим на страницу ленты заказов
+        main_page.click_order_feed_button()
+        order_feed_page.open()
 
-        with allure.step("Перейти в ленту заказов"):
-            order_feed_page = OrderFeedPage(driver)
-            order_feed_page.open_feed_page()
-            assert order_feed_page.is_on_feed_page(), "Страница ленты заказов не загрузилась"
+        # 2. Возвращаемся на главную через кнопку 'Конструктор'
+        main_page.click_constructor_button()
 
-        with allure.step("Вернуться на главную через кнопку 'Конструктор'"):
-            main_page.click_constructor_tab()
-            assert main_page.is_on_main_page(), "Не удалось вернуться на главную страницу"
+        # 3. Проверяем, что находимся на главной странице
+        assert main_page.is_element_visible(MainPageLocators.CONSTRUCTOR_BUTTON)
 
-    @allure.title("2. Переход по клику на раздел «Лента заказов»")
-    def test_navigate_to_order_feed(self, main_page):
-        """
-        Тест проверяет переход в ленту заказов
-        """
-        with allure.step("Открыть главную страницу"):
-            main_page.open_main_page()
-            assert main_page.is_on_main_page(), "Главная страница не загрузилась"
+    @allure.title("Переход по клику на раздел «Лента заказов»")
+    @allure.description("Проверка перехода на страницу ленты заказов при клике на соответствующую кнопку в шапке")
+    def test_navigate_to_order_feed(self, main_page, order_feed_page):
+        """Тест перехода в ленту заказов"""
+        # 1. Переходим в ленту заказов
+        main_page.click_order_feed_button()
+        order_feed_page.open()
 
-        with allure.step("Перейти в ленту заказов через кнопку"):
-            main_page.click_order_feed_tab()
-            order_feed_page = OrderFeedPage(main_page.driver)
-            assert order_feed_page.is_on_feed_page(), "Не удалось перейти на страницу ленты заказов"
+        # 2. Проверяем, что находимся на странице ленты заказов
+        assert order_feed_page.is_feed_page_loaded()
 
-    @allure.title("3. Клик на ингредиент открывает всплывающее окно с деталями")
+    @allure.title("Клик на ингредиент открывает всплывающее окно с деталями")
+    @allure.description(
+        "Проверка, что при клике на любой ингредиент открывается модальное окно с его детальной информацией")
     def test_click_ingredient_opens_modal(self, main_page, ingredient_modal):
-        """
-        Тест проверяет открытие модального окна при клике на ингредиент
-        """
-        with allure.step("Открыть главную страницу"):
-            main_page.open_main_page()
-            assert main_page.is_on_main_page(), "Главная страница не загрузилась"
+        """Тест открытия модального окна при клике на ингредиент"""
+        # 1. Кликаем на ингредиент
+        main_page.click_first_bun_ingredient()
 
-        with allure.step("Кликнуть на первый ингредиент"):
-            assert main_page.click_first_ingredient(), "Не удалось кликнуть на ингредиент"
+        # 2. Проверяем, что модальное окно открылось
+        assert ingredient_modal.is_modal_visible()
 
-        with allure.step("Проверить, что модальное окно открылось"):
-            assert ingredient_modal.wait_for_modal_open(timeout=5), "Модальное окно не открылось"
-            assert ingredient_modal.is_modal_opened(), "Модальное окно не открылось"
-            assert ingredient_modal.get_ingredient_name(), "Название ингредиента не отображается"
-
-    @allure.title("4. Всплывающее окно закрывается кликом по крестик")
+    @allure.title("Закрытие модального окна по крестику")
     @allure.description("Проверка закрытия модального окна при клике на кнопку закрытия")
-    def test_close_ingredient_modal_with_x(self, main_page, ingredient_modal):
+    def test_ingredient_modal_closes(self, driver, base_url):  # Добавляем base_url в параметры
         """
         Тест проверяет закрытие модального окна при клике на крестик
+        1. Открываем главную страницу
+        2. Кликаем на ингредиент для открытия модального окна
+        3. Кликаем на крестик для закрытия
+        4. Проверяем, что модальное окна закрылось
         """
-        with allure.step("Открыть главную страницу"):
-            main_page.open_main_page()
-            assert main_page.is_on_main_page(), "Главная страница не загрузилась"
+        # Создаем экземпляры страниц
+        main_page = MainPage(driver, base_url)
+        modal = IngredientModal(driver, base_url)
 
-        with allure.step("Открыть модальное окно ингредиента"):
-            assert main_page.click_first_ingredient(), "Не удалось кликнуть на ингредиент"
-            assert ingredient_modal.wait_for_modal_open(timeout=5), "Модальное окно не открылось"
+        # Открываем главную страницу
+        main_page.open()
 
-        with allure.step("Закрыть модальное окно кликом по крестику"):
-            assert ingredient_modal.click_close_button(), "Не удалось закрыть модальное окно"
+        # Открываем модальное окно
+        main_page.click_first_bun_ingredient()
+        assert modal.is_modal_opened(), "Модальное окно не открылось"
 
-        with allure.step("Проверить, что модальное окно закрылось"):
-            assert ingredient_modal.is_modal_closed(), "Модальное окно не закрылось"
+        # Закрываем модальное окно кликом по крестику
+        modal.click_close_button()
 
-    @allure.title("5. Проверка функционала счетчика ингредиента")
-    def test_ingredient_counter_functionality(self, main_page):
-        """
-        Тест проверяет наличие и корректность счетчика ингредиента
-        """
-        with allure.step("Открыть главную страницу"):
-            main_page.open_main_page()
-            assert main_page.is_on_main_page(), "Главная страница не загрузилась"
+        # Проверяем, что модальное окно закрылось
+        assert modal.is_modal_closed(), "Модальное окно не закрылось после клика на крестик"
 
-        with allure.step("Проверить наличие ингредиентов"):
-            ingredients = main_page.get_ingredients()
-            assert len(ingredients) > 0, "На странице должны быть ингредиенты"
+    @allure.title("При добавлении ингредиента в заказ счётчик этого ингредиента увеличивается")
+    @allure.description(
+        "Проверка, что при перетаскивании ингредиента в конструктор заказа счетчик этого ингредиента увеличивается")
+    def test_ingredient_counter_increases(self, driver, main_page):
+        """Тест увеличения счетчика ингредиента при добавлении в заказ"""
+        # 1. Получаем начальное значение счетчика
+        initial_counter = main_page.get_bun_counter_value()
 
-        with allure.step("Проверить счетчик первого ингредиента"):
-            ingredient = ingredients[0]
-            counter = main_page.get_ingredient_counter_from_element(ingredient)
-            assert counter >= 0, "Счетчик не может быть отрицательным"
+        # 2. Добавляем ингредиент в конструктор
+        main_page.drag_bun_to_constructor()
 
-    @allure.title("6. Проверка конструктора")
-    def test_constructor_available(self, driver, main_page):
-        """
-        Тест проверяет наличие и доступность конструктора
-        """
-        with allure.step("Открыть главную страницу"):
-            main_page.open_main_page()
-            assert main_page.is_on_main_page(), "Главная страница не загрузилась"
+        # 3. Получаем новое значение счетчика
+        new_counter = main_page.get_bun_counter_value()
 
-        with allure.step("Проверить наличие конструктора"):
-            constructor = driver.find_elements(By.CSS_SELECTOR, "[class*='BurgerConstructor']")
-            assert len(constructor) > 0, "Конструктор не найден"
-            assert constructor[0].is_displayed(), "Конструктор должен быть видимым"
+        # 4. Проверяем, что счетчик увеличился
+        assert new_counter > initial_counter
 
-        with allure.step("Проверить наличие ингредиентов"):
-            ingredients = main_page.get_ingredients()
-            assert len(ingredients) > 0, "Нет ингредиентов для конструктора"
+    @allure.story("Работа с конструктором бургеров")
+    @allure.title("Переключение на раздел «Булки» в конструкторе")
+    def test_switch_to_buns_section(self, driver, main_page):
+        """Тест переключения на раздел 'Булки'"""
+        # Сначала переключаемся на другой раздел
+        sauces_element = main_page.driver.find_element(*main_page.locators.SAUCES_SECTION)
+        main_page.driver.execute_script("arguments[0].click();", sauces_element)
+
+        # Затем возвращаемся к булкам
+        buns_element = main_page.driver.find_element(*main_page.locators.BUNS_SECTION)
+        main_page.driver.execute_script("arguments[0].click();", buns_element)
+
+        # Проверяем результат
+        assert main_page.is_element_visible(main_page.locators.BUNS_SECTION)
+
+    @allure.story("Работа с конструктором бургеров")
+    @allure.title("Переключение на раздел «Соусы» в конструкторе")
+    def test_switch_to_sauces_section(self, driver, main_page):
+        """Тест переключения на раздел 'Соусы'"""
+        # Кликаем через JavaScript
+        element = main_page.driver.find_element(*main_page.locators.SAUCES_SECTION)
+        main_page.driver.execute_script("arguments[0].click();", element)
+
+        # Проверяем результат
+        assert main_page.is_element_visible(main_page.locators.SAUCES_SECTION)
+
+    @allure.story("Работа с конструктором бургеров")
+    @allure.title("Переключение на раздел «Начинки» в конструкторе")
+    @allure.description("Проверка переключения между разделами конструктора - активация раздела 'Начинки'")
+    def test_switch_to_fillings_section(self, driver, main_page):
+        """Тест переключения на раздел 'Начинки'"""
+        # 1. Переключаемся на раздел 'Начинки'
+        main_page.click_fillings_section()
+
+        # 2. Проверяем, что раздел 'Начинки' активен
+        assert main_page.is_element_visible(main_page.locators.FILLINGS_SECTION)

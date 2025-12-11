@@ -4,42 +4,34 @@ from selenium.webdriver.common.by import By
 class IngredientModalLocators:
     """Локаторы для модального окна ингредиента"""
 
-    # === ОСНОВНОЕ МОДАЛЬНОЕ ОКНО ===
-
     # Основной контейнер модального окна
-    MODAL_CONTENT = (By.XPATH, "//div[contains(@class, 'Modal_modal__')]")  # из первого варианта
-    MODAL_CONTAINER = (By.CSS_SELECTOR, "[class*='Modal_modal']")  # из второго варианта
+    MODAL_CONTENT = (By.XPATH, "//div[contains(@class, 'Modal_modal__')]")
+    MODAL_CONTAINER = (By.CSS_SELECTOR, "[class*='Modal_modal']")
 
     # Оверлей (фон)
-    MODAL_OVERLAY = (By.XPATH, "//div[contains(@class, 'Modal_modal_overlay__')]")  # из первого варианта
-    MODAL_OVERLAY_ALT = (By.CSS_SELECTOR, "[class*='Modal_overlay']")  # из второго варианта
-
-    # === ЭЛЕМЕНТЫ УПРАВЛЕНИЯ ===
+    MODAL_OVERLAY = (By.XPATH, "//div[contains(@class, 'Modal_modal_overlay__')]")
+    MODAL_OVERLAY_ALT = (By.CSS_SELECTOR, "[class*='Modal_overlay']")
 
     # Кнопки закрытия
-    CLOSE_BUTTON = (By.XPATH, "//div[contains(@class, 'Modal_modal__')]//button")  # из первого варианта
-    CLOSE_BUTTON_ALT = (By.CSS_SELECTOR, "button[class*='Modal_close']")  # из второго варианта
+    CLOSE_BUTTON = (By.XPATH, "//div[contains(@class, 'Modal_modal__')]//button")
+    CLOSE_BUTTON_ALT = (By.CSS_SELECTOR, "button[class*='Modal_close']")
 
     # Универсальные локаторы для кнопок закрытия
     MODAL_CLOSE_BUTTON = (By.XPATH, "//button[contains(@class, 'close') or contains(@class, 'Close')]")
 
-    # === ЗАГОЛОВОК ===
+    # ЗАГОЛОВОК
 
-    MODAL_TITLE = (By.XPATH, "//div[contains(@class, 'Modal_modal__')]//h3")  # из первого варианта
-    MODAL_TITLE_ALT = (By.CSS_SELECTOR, "[class*='Modal_title']")  # из второго варианта
-
-    # === СОДЕРЖИМОЕ ИНГРЕДИЕНТА ===
+    MODAL_TITLE = (By.XPATH, "//div[contains(@class, 'Modal_modal__')]//h3")
+    MODAL_TITLE_ALT = (By.CSS_SELECTOR, "[class*='Modal_title']")
 
     # Детали ингредиента
-    INGREDIENT_DETAILS = (By.XPATH, "//div[contains(@class, 'IngredientDetails_details__')]")  # из первого варианта
-    INGREDIENT_DETAILS_ALT = (By.CSS_SELECTOR, "[class*='IngredientDetails_details']")  # из второго варианта
+    INGREDIENT_DETAILS = (By.XPATH, "//div[contains(@class, 'IngredientDetails_details__')]")
+    INGREDIENT_DETAILS_ALT = (By.CSS_SELECTOR, "[class*='IngredientDetails_details']")
 
     # Название ингредиента
     INGREDIENT_NAME = (By.XPATH,
-                       "//div[contains(@class, 'Modal_modal__')]//p[contains(@class, 'text')]")  # из первого варианта
-    INGREDIENT_NAME_ALT = (By.CSS_SELECTOR, "[class*='IngredientDetails_name']")  # из второго варианта
-
-    # === ПИЩЕВАЯ ЦЕННОСТЬ ===
+                       "//div[contains(@class, 'Modal_modal__')]//p[contains(@class, 'text')]")
+    INGREDIENT_NAME_ALT = (By.CSS_SELECTOR, "[class*='IngredientDetails_name']")
 
     # Значения из второго варианта
     CALORIES_VALUE = (By.XPATH, "//p[contains(text(), 'Калории')]/following-sibling::p[1]")
@@ -56,22 +48,20 @@ class IngredientModalLocators:
     # Контейнер с пищевой ценностью
     NUTRITION_CONTAINER = (By.CSS_SELECTOR, "[class*='IngredientDetails_nutrition']")
 
-    # === ИЗОБРАЖЕНИЕ ИНГРЕДИЕНТА ===
+    # ИЗОБРАЖЕНИЕ ИНГРЕДИЕНТА
 
     IMAGE_CONTAINER = (By.CSS_SELECTOR, "[class*='IngredientDetails_image']")
     INGREDIENT_IMAGE = (By.CSS_SELECTOR, "[class*='IngredientDetails_image'] img")
 
-    # === АЛЬТЕРНАТИВНЫЕ/УНИВЕРСАЛЬНЫЕ ЛОКАТОРЫ ===
-
     # Для совместимости и отказоустойчивости
-    ALTERNATIVE_MODAL = (By.CSS_SELECTOR, "[role='dialog'], [aria-modal='true']")  # из второго варианта
+    ALTERNATIVE_MODAL = (By.CSS_SELECTOR, "[role='dialog'], [aria-modal='true']")
     ALTERNATIVE_CLOSE = (By.CSS_SELECTOR,
-                         "button[aria-label*='закрыть'], button[aria-label*='close']")  # из второго варианта
+                         "button[aria-label*='закрыть'], button[aria-label*='close']")
 
     # Универсальный поиск любого модального окна
     ANY_MODAL_WINDOW = (By.XPATH, "//div[contains(@class, 'modal') or contains(@class, 'Modal')]")
 
-    # === ВСПОМОГАТЕЛЬНЫЕ ЛОКАТОРЫ ===
+    #  ВСПОМОГАТЕЛЬНЫЕ ЛОКАТОРЫ
 
     # Для ожидания появления/исчезновения
     MODAL_VISIBLE = (By.CSS_SELECTOR,
@@ -81,8 +71,6 @@ class IngredientModalLocators:
 
     # Содержимое модалки
     MODAL_BODY = (By.CSS_SELECTOR, "[class*='Modal_body']")
-
-    # === МЕТОДЫ ДЛЯ УДОБСТВА ===
 
     @classmethod
     def get_nutrition_value(cls, nutrient_type: str) -> tuple:
