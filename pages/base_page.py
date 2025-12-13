@@ -46,15 +46,11 @@ class BasePage:
         self.driver.execute_script("arguments[0].click();", element)
 
     @allure.step("Проверить видимость элемента")
-    def is_element_visible(self, locator, timeout=5):
-        """Проверить, виден ли элемент"""
-        elements = self.driver.find_elements(*locator)
-
-        if elements:
-            element = elements[0]
-            return element.is_displayed()
-
-        return False
+    def is_element_visible(self, locator, timeout=10):
+        """Проверить, виден ли элемент с ожиданием"""
+        return WebDriverWait(self.driver, timeout).until(
+            EC.visibility_of_element_located(locator)
+        )
 
     @allure.step("Перетащить элемент из {source_locator} в {target_locator}")
     def drag_and_drop(self, source_locator, target_locator):

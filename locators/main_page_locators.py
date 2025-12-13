@@ -29,7 +29,7 @@ class MainPageLocators:
 
     # Ингредиенты
     FIRST_BUN_INGREDIENT = (By.XPATH, "(//h2[text()='Булки']/following::a)[1]")
-    BUN_COUNTER = (By.XPATH, "(//h2[text()='Булки']/following::a[1]//div[contains(@class, 'counter')])[1]")
+    BUN_COUNTER = (By.XPATH, "//div[contains(@class, 'counter')]//p")
     CONSTRUCTOR_DROP_AREA = (By.XPATH, "//section[contains(@class, 'BurgerConstructor_basket')]")
     INGREDIENT_CARD = (By.XPATH, "//div[contains(@class, 'BurgerIngredient_ingredient')]")
     INGREDIENT_NAME = (By.XPATH, ".//p[contains(@class, 'BurgerIngredient_name')]")

@@ -5,6 +5,7 @@ logs/
 *.log
 test-results/
 __pycache__/
+.cache/
 .pyc
 # Драйверы браузеров
 chromedriver*

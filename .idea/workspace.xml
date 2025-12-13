@@ -5,21 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="963edd43-dc10-4a5d-9008-23b8a8b271e9" name="Changes" comment="Удалил .idea/ .gitignore">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/conftest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/locators/ingredient_modal_locators.py" beforeDir="false" afterPath="$PROJECT_DIR$/locators/ingredient_modal_locators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/locators/main_page_locators.py" beforeDir="false" afterPath="$PROJECT_DIR$/locators/main_page_locators.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/locators/order_feed_locators.py" beforeDir="false" afterPath="$PROJECT_DIR$/locators/order_feed_locators.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pages/base_page.py" beforeDir="false" afterPath="$PROJECT_DIR$/pages/base_page.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/feed_page.py" beforeDir="false" afterPath="$PROJECT_DIR$/pages/feed_page.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/ingredient_modal.py" beforeDir="false" afterPath="$PROJECT_DIR$/pages/ingredient_modal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/login_page.py" beforeDir="false" afterPath="$PROJECT_DIR$/pages/login_page.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/main_page.py" beforeDir="false" afterPath="$PROJECT_DIR$/pages/main_page.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pages/order_feed_page.py" beforeDir="false" afterPath="$PROJECT_DIR$/pages/order_feed_page.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_main_functionality.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_main_functionality.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_order_feed.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_order_feed.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,13 +54,14 @@
     "Notification.DisplayName-DoNotAsk-Vcs Notifications": "VCS notifications",
     "Notification.DoNotAsk-Vcs Notifications": "true",
     "Python tests.Python tests for test_main_functionality.TestMainFunctionality.test_close_ingredient_modal_with_x.executor": "Run",
+    "Python tests.Python tests for test_main_functionality.TestMainFunctionality.test_ingredient_counter_increases.executor": "Run",
     "Python tests.Python tests for test_main_functionality.TestMainFunctionality.test_navigate_to_constructor.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "develop3"
   }
 }]]></component>
-  <component name="RunManager" selected="Python tests.Python tests for test_main_functionality.TestMainFunctionality.test_navigate_to_constructor">
+  <component name="RunManager" selected="Python tests.Python tests for test_main_functionality.TestMainFunctionality.test_ingredient_counter_increases">
     <configuration name="Python tests for test_main_functionality.TestMainFunctionality.test_close_ingredient_modal_with_x" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="Diplom_3" />
       <option name="ENV_FILES" value="" />
@@ -81,6 +74,21 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
       <option name="_new_target" value="&quot;test_main_functionality.TestMainFunctionality.test_close_ingredient_modal_with_x&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_main_functionality.TestMainFunctionality.test_ingredient_counter_increases" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="Diplom_3" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_main_functionality.TestMainFunctionality.test_ingredient_counter_increases&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
@@ -101,6 +109,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.Python tests for test_main_functionality.TestMainFunctionality.test_ingredient_counter_increases" />
         <item itemvalue="Python tests.Python tests for test_main_functionality.TestMainFunctionality.test_navigate_to_constructor" />
         <item itemvalue="Python tests.Python tests for test_main_functionality.TestMainFunctionality.test_close_ingredient_modal_with_x" />
       </list>
@@ -188,6 +197,7 @@
     <MESSAGE value=" &quot;&quot;&quot;&#10;    Компонент для работы с модальным окном деталей ингредиента&#10;    &#10;    Этот компонент используется поверх других страниц (главная страница, лента заказов)&#10;    когда пользователь кликает на ингредиент для просмотра деталей.&#10;    &quot;&quot;&quot;" />
     <MESSAGE value=" Правки 3" />
     <MESSAGE value="Удалил .idea/ .gitignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="Удалил .idea/ .gitignore" />
+    <MESSAGE value="Обновлены тесты основной функциональности" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
   </component>
 </project>
