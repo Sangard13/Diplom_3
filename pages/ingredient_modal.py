@@ -9,8 +9,8 @@ from locators.ingredient_modal_locators import IngredientModalLocators
 class IngredientModal(BasePage):
     """Класс для работы с модальным окном деталей ингредиента"""
 
-    def __init__(self, driver, base_url):
-        super().__init__(driver, base_url)
+    def __init__(self, driver):
+        super().__init__(driver, "")
 
     @allure.step("Проверить, что модальное окно открыто")
     def is_modal_opened(self):
@@ -91,18 +91,21 @@ class IngredientModal(BasePage):
 
     def wait_for_modal_visible(self, timeout=10):
         """Ожидать, что модальное окно станет видимым"""
-        WebDriverWait(self.driver, timeout).until(
-            lambda d: self.is_modal_visible()
+        return self.wait_for(
+            condition=lambda d: self.is_modal_visible(),
+            timeout=timeout
         )
 
     def wait_for_modal_opened(self, timeout=10):
         """Ожидать открытия модального окна"""
-        WebDriverWait(self.driver, timeout).until(
-            lambda d: self.is_modal_opened()
+        return self.wait_for(
+            condition=lambda d: self.is_modal_opened(),
+            timeout=timeout
         )
 
     def wait_for_modal_closed(self, timeout=10):
         """Ожидать закрытия модального окна"""
-        WebDriverWait(self.driver, timeout).until(
-            lambda d: self.is_modal_closed()
+        return self.wait_for(
+            condition=lambda d: self.is_modal_closed(),
+            timeout=timeout
         )

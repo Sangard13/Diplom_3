@@ -1,8 +1,9 @@
 import allure
-import pytest
-import time
-from config import TEST_USER, PAGES
-from helpers.api_helpers import StellarBurgersAPI
+import sys
+import os
+
+# Добавляем путь для импортов
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 @allure.feature("Лента заказов")
@@ -11,49 +12,48 @@ class TestOrderFeed:
     """Тесты функциональности ленты заказов"""
 
     @allure.title("6. Счётчик 'Выполнено за всё время' отображается")
-    def test_total_counter_displayed(self, order_feed_page):
+    def test_total_counter_displayed(self, feed_page):
         """Тест отображения счетчика 'Выполнено за всё время'"""
-
         with allure.step("Открыть ленту заказов"):
-            order_feed_page.open()
-            order_feed_page.wait_for_page_load()
+            feed_page.open()
+            feed_page.wait_for_page_load()
 
-        with allure.step("Проверить, что на странице ленты"):
-            order_feed_page.wait_for_url_contains("/feed")
+        with allure.step("Проверить URL страницы"):
+            assert feed_page.is_feed_page(), "Не находимся на странице ленты заказов"
 
-        with allure.step("Проверить счетчик"):
-            assert order_feed_page.is_total_counter_displayed()
+        with allure.step("Проверить отображение счетчика 'Выполнено за всё время'"):
+            assert feed_page.is_total_orders_counter_displayed(), \
+                "Счетчик 'Выполнено за всё время' не отображается"
+
+            total_count = feed_page.get_total_orders_count()
+            assert total_count is not None, "Не удалось получить значение счетчика"
+            assert total_count >= 0, f"Некорректное значение счетчика: {total_count}"
 
     @allure.title("7. Счётчик 'Выполнено за сегодня' отображается")
-    def test_today_counter_displayed(self, driver, feed_page):
-        """Тест отображения счетчика"""
+    def test_today_counter_displayed(self, feed_page):
+        """Тест отображения счетчика 'Выполнено за сегодня'"""
         with allure.step("Открыть ленту заказов"):
             feed_page.open()
-            time.sleep(3)
+            feed_page.wait_for_page_load()
 
-        with allure.step("Проверить загрузку страницы"):
-            assert "/feed" in driver.current_url
-            print("Страница ленты заказов загружена")
+        with allure.step("Проверить отображение счетчика 'Выполнено за сегодня'"):
+            assert feed_page.is_today_orders_counter_displayed(), \
+                "Счетчик 'Выполнено за сегодня' не отображается"
+
+            today_count = feed_page.get_today_orders_count()
+            assert today_count is not None, "Не удалось получить значение счетчика за сегодня"
 
     @allure.title("8. Раздел 'В работе' отображается")
-    def test_orders_in_progress_displayed(self, driver, feed_page):
-        """Тест отображения раздела"""
+    def test_orders_in_progress_displayed(self, feed_page):
+        """Тест отображения раздела 'В работе'"""
         with allure.step("Открыть ленту заказов"):
             feed_page.open()
-            time.sleep(3)
+            feed_page.wait_for_page_load()
 
-        with allure.step("Проверить основные элементы"):
-            # Проверяем наличие ключевых элементов на странице
-            page_text = driver.page_source.lower()
+        with allure.step("Проверить отображение раздела 'В работе'"):
+            assert feed_page.is_in_progress_section_displayed(), \
+                "Раздел 'В работе' не отображается"
 
-            keywords = ["в работе", "готовы", "выполнено", "order", "feed"]
-            found_keywords = [kw for kw in keywords if kw in page_text]
-
-            print(f"Найдены ключевые слова: {found_keywords}")
-
-            # Мягкая проверка
-            if len(found_keywords) == 0:
-                print("Ключевые слова не найдены, делаем скриншот")
-                driver.save_screenshot("feed_page_debug.png")
-
-            assert True
+            in_progress_orders = feed_page.get_in_progress_orders_list()
+            # Может быть пустым список
+            assert in_progress_orders is not None

@@ -1,19 +1,19 @@
 import allure
 from pages.base_page import BasePage
 from locators.feed_page_locators import FeedPageLocators
-
+from urls import FEED_PAGE
 
 class FeedPage(BasePage):
     """Класс для работы со страницей ленты заказов"""
 
-    def __init__(self, driver, base_url):
-        super().__init__(driver, base_url)
+    def __init__(self, driver):
+        super().__init__(driver, FEED_PAGE)
         self.locators = FeedPageLocators()
 
     @allure.step("Открыть страницу ленты заказов")
     def open(self):
         """Открыть страницу ленты заказов"""
-        super().open("/feed")
+        super().open()
 
     @allure.step("Получить общее количество заказов")
     def get_total_orders_count(self):

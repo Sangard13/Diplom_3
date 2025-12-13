@@ -94,18 +94,16 @@ def wait(driver):
 def main_page(driver, base_url):
     """Главная страница"""
     from pages.main_page import MainPage
-    page = MainPage(driver, base_url)
+    page = MainPage(driver)
     page.open()
     return page
 
 
 @pytest.fixture(scope="function")
-def order_feed_page(driver, base_url):
+def order_feed_page(driver):  # УБРАТЬ base_url из параметров
     """Страница ленты заказов"""
     from pages.order_feed_page import OrderFeedPage
-    page = OrderFeedPage(driver, base_url)
-    page.open()
-    return page
+    return OrderFeedPage(driver)
 
 @pytest.fixture(scope="function")
 def ingredient_modal(driver, base_url):
@@ -114,17 +112,16 @@ def ingredient_modal(driver, base_url):
     return IngredientModal(driver, base_url)
 
 @pytest.fixture(scope="function")
-def login_page(driver, base_url):
+def login_page(driver):
     """Страница логина"""
     from pages.login_page import LoginPage
-    page = LoginPage(driver, base_url)
-    return page
+    return LoginPage(driver)
 
 @pytest.fixture
 def login_page(driver, base_url):
     """Фикстура для страницы логина"""
     from pages.login_page import LoginPage
-    page = LoginPage(driver, base_url)
+    page = LoginPage(driver)
     page.open()
     return page
 

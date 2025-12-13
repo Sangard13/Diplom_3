@@ -83,13 +83,3 @@ class IngredientModalLocators:
         }
         return nutrient_map.get(nutrient_type.lower(), cls.CALORIES_VALUE)
 
-    @classmethod
-    def get_nutrition_label(cls, nutrient_type: str) -> tuple:
-        """Динамическое получение локатора для названия питательного вещества"""
-        nutrient_map = {
-            'calories': cls.CALORIES_LABEL,
-            'proteins': cls.PROTEINS_LABEL,
-            'fats': cls.FATS_LABEL,
-            'carbohydrates': cls.CARBOHYDRATES_LABEL
-        }
-        return nutrient_map.get(nutrient_type.lower(), cls.CALORIES_LABEL)

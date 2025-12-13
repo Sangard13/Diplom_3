@@ -1,30 +1,27 @@
 import allure
+from urls import MAIN_PAGE
 from selenium.webdriver.support.wait import WebDriverWait
-from pages.base_page import BasePage
+from .base_page import BasePage
 from locators.main_page_locators import MainPageLocators
 
 
 class MainPage(BasePage):
     """Класс для работы с главной страницей (конструктор)"""
 
-    def __init__(self, driver, base_url):
-        super().__init__(driver, base_url)
+    @allure.step("Создание MainPage")
+    def __init__(self, driver):
+        super().__init__(driver, MAIN_PAGE)
         self.locators = MainPageLocators()
-
-    @allure.step("Открыть главную страницу")
-    def open(self):
-        """Открыть главную страницу"""
-        super().open("/")
 
     @allure.step("Кликнуть на кнопку 'Конструктор'")
     def click_constructor_button(self):
         """Кликнуть на кнопку Конструктор в навигации"""
         self.click_element(self.locators.CONSTRUCTOR_BUTTON)
 
-    @allure.step("Кликнуть на кнопку 'Лента Заказов'")
+    @allure.step("Кликнуть на кнопку 'Лента Заказов' с помощью JavaScript")
     def click_order_feed_button(self):
         """Кликнуть на кнопку Лента Заказов в навигации"""
-        self.click_element(self.locators.ORDER_FEED_BUTTON)
+        self.click_element_with_js(self.locators.ORDER_FEED_BUTTON)
 
     @allure.step("Кликнуть на первую булку")
     def click_first_bun_ingredient(self):
@@ -55,7 +52,6 @@ class MainPage(BasePage):
     @allure.step("Кликнуть на раздел 'Соусы'")
     def click_sauces_section(self):
         """Кликнуть на раздел 'Соусы'"""
-        # Используем JavaScript для обхода перекрытия
         element = self.find_element(self.locators.SAUCES_SECTION)
         element.click()
 
@@ -65,3 +61,15 @@ class MainPage(BasePage):
         element = self.find_element(self.locators.FILLINGS_SECTION)
         element.click()
 
+    @allure.step("Проверить видимость раздела 'Булки'")
+    def is_buns_section_visible(self):
+        return self.is_element_visible(self.locators.BUNS_SECTION, timeout=3)
+
+    @allure.step("Проверить видимость раздела 'Соусы'")
+    def is_sauces_section_visible(self):
+        return self.is_element_visible(self.locators.SAUCES_SECTION, timeout=3)
+
+    @allure.step("Проверить что раздел 'Начинки' отображается")
+    def is_fillings_section_visible(self):
+        """Просто проверяем что раздел виден (без проверки активности)"""
+        return self.is_element_visible(self.locators.FILLINGS_SECTION, timeout=3)

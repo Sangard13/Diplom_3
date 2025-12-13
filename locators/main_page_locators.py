@@ -50,3 +50,8 @@ class MainPageLocators:
     MODAL_OVERLAY = (By.XPATH, "//div[contains(@class, 'Modal_modal_overlay__')]")
     MODAL_CONTENT = (By.XPATH, "//div[contains(@class, 'Modal_modal__')]")
     MODAL_TITLE = (By.XPATH, "//div[contains(@class, 'Modal_modal__')]//h3")
+
+    # Локаторы для активных состояний разделов
+    BUNS_SECTION_ACTIVE = (By.XPATH, "//div[contains(@class, 'tab_tab') and contains(text(), 'Булки')]")
+    SAUCES_SECTION_ACTIVE = (By.XPATH, "//div[contains(@class, 'tab_tab') and contains(text(), 'Соусы')]")
+    FILLINGS_SECTION_ACTIVE = (By.XPATH, "//div[contains(@class, 'tab_tab') and contains(text(), 'Начинки')]")

@@ -1,20 +1,19 @@
 import allure
 from pages.base_page import BasePage
 from locators.login_locators import LoginLocators
-from urls import PAGES
+from urls import LOGIN_PAGE
 
 
 class LoginPage(BasePage):
     """Класс для работы со страницей авторизации"""
 
-    def __init__(self, driver, base_url):
-        super().__init__(driver, base_url)
-        self.login_page_url = f"{base_url}{PAGES['login']}"
+    def __init__(self, driver):
+        super().__init__(driver, LOGIN_PAGE)
 
     @allure.step("Открыть страницу логина")
     def open(self):
         """Открыть страницу логина"""
-        super().open(PAGES["login"])
+        super().open()
 
     @allure.step("Ввести email: {email}")
     def enter_email(self, email):

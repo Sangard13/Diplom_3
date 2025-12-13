@@ -8,15 +8,22 @@ from selenium.webdriver.support import expected_conditions as EC
 class BasePage:
     """Базовый класс для всех страниц"""
 
-    def __init__(self, driver, base_url):
+    def __init__(self, driver, url: str):
         self.driver = driver
-        self.base_url = base_url
-        self.wait = WebDriverWait(driver, 10)
+        self.url: str = url
 
-    @allure.step("Открыть страницу {url}")
-    def open(self, url=""):
+    def open(self):
         """Открыть страницу"""
-        self.driver.get(f"{self.base_url}{url}")
+        self.driver.get(self.url)
+
+    def wait_for(self, condition, timeout=10):
+        """
+        Универсальный метод ожидания условия
+        Args:
+            condition: функция, которая принимает driver и возвращает True/False
+            timeout: максимальное время ожидания в секундах
+        """
+        return WebDriverWait(self.driver, timeout).until(condition)
 
     @allure.step("Найти элемент {locator} с ожиданием {timeout} секунд")
     def find_element(self, locator, timeout=10):
@@ -31,13 +38,15 @@ class BasePage:
         return wait.until(EC.presence_of_all_elements_located(locator))
 
     @allure.step("Кликнуть на элемент с помощью JavaScript")
-    def click_element_with_js(self, locator):
+    def click_element_with_js(self, locator, timeout=10):
         """Кликнуть на элемент с помощью JavaScript"""
-        element = self.wait.until(EC.presence_of_element_located(locator))
+        element = WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_element_located(locator)
+        )
         self.driver.execute_script("arguments[0].click();", element)
 
     @allure.step("Проверить видимость элемента")
-    def is_element_visible(self, locator):
+    def is_element_visible(self, locator, timeout=5):
         """Проверить, виден ли элемент"""
         elements = self.driver.find_elements(*locator)
 
@@ -59,7 +68,7 @@ class BasePage:
     @allure.step("Получить текст элемента")
     def get_element_text(self, locator):
         """Получить текст элемента"""
-        element = self.wait.until(EC.visibility_of_element_located(locator))
+        element = self.find_element(locator)
         return element.text
 
     @allure.step("Ожидание исчезновения элемента")
@@ -76,9 +85,11 @@ class BasePage:
         element.send_keys(text)
 
     @allure.step("Кликнуть по элементу")
-    def click_element(self, locator):
+    def click_element(self, locator, timeout=10):
         """Кликнуть по элементу"""
-        element = self.wait.until(EC.element_to_be_clickable(locator))
+        element = WebDriverWait(self.driver, timeout).until(  # Добавьте timeout
+            EC.element_to_be_clickable(locator)
+        )
         element.click()
 
     def wait_for_url_contains(self, text, timeout=10):
@@ -119,3 +130,8 @@ class BasePage:
         """Найти элементы по тексту и классу"""
         locator = (By.XPATH, f"//div[contains(@class, '{class_name}') and contains(text(), '{text}')]")
         return self.find_elements(locator)
+
+    @allure.step("Обновить страницу")
+    def refresh(self):
+        """Обновить текущую страницу"""
+        self.driver.refresh()

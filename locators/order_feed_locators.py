@@ -4,6 +4,10 @@ from selenium.webdriver.common.by import By
 class OrderFeedLocators:
     """Локаторы для страницы ленты заказов"""
 
+    FEED_HEADER = (By.XPATH, "//h1[contains(text(), 'Лента заказов')]")
+    IN_PROGRESS_SECTION = (By.XPATH, "//*[contains(text(), 'В работе')]")
+    IN_PROGRESS_ORDERS = (By.CLASS_NAME, "order-in-progress")
+
     # Основные элементы страницы
     FEED_PAGE_INDICATOR = (By.XPATH, "//h1[contains(text(), 'Лента заказов') or contains(text(), 'лента заказов')]")
     FEED_CONTENT = (By.CSS_SELECTOR, "[class*='OrderFeed_orderList']")
