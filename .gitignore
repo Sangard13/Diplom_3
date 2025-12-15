@@ -1,0 +1,21 @@
+reports/
+allure-results*/
+screenshots/
+logs/
+*.log
+test-results/
+.cache/
+.pyc
+# Драйверы браузеров
+chromedriver*
+geckodriver*
+
+# Конфиденциальные данные
+*.env
+config.local.py
+
+# Отчеты
+report*.html".idea/"
+
+".idea/" 
+"__pycache__/" 
