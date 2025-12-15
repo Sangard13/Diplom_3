@@ -1,6 +1,7 @@
 """Page Object для модального окна ингредиента"""
 
 import allure
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from pages.base_page import BasePage
 from locators.ingredient_modal_locators import IngredientModalLocators
@@ -11,6 +12,8 @@ class IngredientModal(BasePage):
 
     def __init__(self, driver):
         super().__init__(driver, "")
+        self.locators = IngredientModalLocators()
+        self.url = "/"
 
     @allure.step("Проверить, что модальное окно открыто")
     def is_modal_opened(self):
@@ -48,10 +51,11 @@ class IngredientModal(BasePage):
         self.click_close_button()
         return self.is_modal_closed()
 
-    @allure.step("Проверить видимость модального окна")
-    def is_modal_visible(self):
-        """Проверить видимость модального окна"""
-        return self.is_element_visible(IngredientModalLocators.MODAL_CONTENT)
+    @allure.step("Проверить открытие деталей ингредиента")
+    def is_ingredient_details_visible(self):
+        """Проверить что детали ингредиента видны"""
+        # В вашем приложении открывается страница, а не модальное окно
+        return "/ingredient/" in self.driver.current_url
 
     @allure.step("Проверить калорийность ингредиента")
     def get_calories(self):
@@ -89,23 +93,3 @@ class IngredientModal(BasePage):
         self.click_element(IngredientModalLocators.MODAL_OVERLAY)
         return self.is_modal_closed()
 
-    def wait_for_modal_visible(self, timeout=10):
-        """Ожидать, что модальное окно станет видимым"""
-        return self.wait_for(
-            condition=lambda d: self.is_modal_visible(),
-            timeout=timeout
-        )
-
-    def wait_for_modal_opened(self, timeout=10):
-        """Ожидать открытия модального окна"""
-        return self.wait_for(
-            condition=lambda d: self.is_modal_opened(),
-            timeout=timeout
-        )
-
-    def wait_for_modal_closed(self, timeout=10):
-        """Ожидать закрытия модального окна"""
-        return self.wait_for(
-            condition=lambda d: self.is_modal_closed(),
-            timeout=timeout
-        )

@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.support.ui import WebDriverWait
+from pages.ingredient_modal import IngredientModal
 from selenium.webdriver.support import expected_conditions as EC
 
 def pytest_addoption(parser):
@@ -108,8 +109,7 @@ def order_feed_page(driver):  # УБРАТЬ base_url из параметров
 @pytest.fixture(scope="function")
 def ingredient_modal(driver, base_url):
     """Модальное окно ингредиента"""
-    from pages.ingredient_modal import IngredientModal
-    return IngredientModal(driver, base_url)
+    return IngredientModal(driver)
 
 @pytest.fixture(scope="function")
 def login_page(driver):

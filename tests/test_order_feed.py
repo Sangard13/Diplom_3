@@ -30,6 +30,7 @@ class TestOrderFeed:
             assert total_count != "", "Значение счетчика пустое"
 
     @allure.title("7. Счётчик 'Выполнено за сегодня' отображается")
+
     def test_today_counter_displayed(self, feed_page):
         """Тест отображения счетчика 'Выполнено за сегодня'"""
         with allure.step("Открыть ленту заказов"):

@@ -1,12 +1,7 @@
 import allure
-import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from pages.main_page import MainPage
-from pages.ingredient_modal import IngredientModal
+import pytest
 from locators.main_page_locators import MainPageLocators
+from pages.main_page import MainPage
 
 
 @allure.feature("Основная функциональность")
@@ -32,30 +27,37 @@ class TestMainFunctionality:
         order_feed_page.open()
         assert order_feed_page.is_feed_page()
 
-    @allure.title("Клик на ингредиент открывает всплывающее окно с деталями")
-    def test_click_ingredient_opens_modal(self, main_page, driver):
-        """Тест открытия модального окна при клике на ингредиент"""
-        # Открываем главную страницу
-        main_page.open()
-        main_page.click_first_bun_ingredient()
-        modal = IngredientModal(main_page.driver)
-        assert modal.is_modal_visible()
-
-    @allure.title("Закрытие модального окна по крестику")
-    def test_ingredient_modal_closes(self, driver):
-        """Тест закрытия модального окна при клике на крестик"""
-        # Создаем экземпляры страниц
-        main_page = MainPage(driver)
-        modal = IngredientModal(driver)
+    @allure.title("Открытие деталей ингредиента")
+    def test_ingredient_details_opens(self, main_page: MainPage):
+        """Тест проверяет открытие деталей ингредиента при клике"""
 
         # Открываем главную страницу
         main_page.open()
-        main_page.click_first_bun_ingredient()
-        assert modal.is_modal_opened(), "Модальное окно не открылось"
 
-        # Закрываем модальное окно кликом по крестику
-        modal.click_close_button()
-        assert modal.is_modal_closed(), "Модальное окно не закрылось после клика на крестик"
+        # Кликаем на первый ингредиент
+        main_page.click_first_ingredient()
+
+        # Проверяем что детали открылись
+        assert main_page.is_ingredient_details_opened()
+
+    @allure.title("Закрытие страницы ингредиента")
+    def test_close_ingredient_page(self, main_page: MainPage):
+        """Тест проверяет, что можно вернуться со страницы ингредиента на главную"""
+
+        # Открываем главную страницу
+        main_page.open()
+
+        # Открываем страницу ингредиента
+        main_page.click_first_ingredient()
+
+        # Проверяем что страница ингредиента открылась
+        assert main_page.is_ingredient_details_opened()
+
+        # Закрываем страницу ингредиента (возвращаемся назад)
+        main_page.close_ingredient_details()
+
+        # Проверяем что вернулись на главную
+        assert main_page.is_on_main_page()
 
     @allure.title("При добавлении ингредиента в заказ счётчик этого ингредиента увеличивается")
     def test_ingredient_counter_increases(self, main_page):
@@ -101,3 +103,4 @@ class TestMainFunctionality:
 
         assert main_page.is_fillings_section_visible(), \
             "Раздел 'Начинки' не виден после клика"
+

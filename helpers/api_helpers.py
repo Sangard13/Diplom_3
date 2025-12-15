@@ -1,6 +1,6 @@
 import requests
 import allure
-from config import API_ENDPOINTS
+from urls import API_ENDPOINTS
 
 
 class StellarBurgersAPI:
