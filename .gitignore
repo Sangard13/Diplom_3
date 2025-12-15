@@ -4,7 +4,6 @@ screenshots/
 logs/
 *.log
 test-results/
-__pycache__/
 .cache/
 .pyc
 # Драйверы браузеров
@@ -17,4 +16,6 @@ config.local.py
 
 # Отчеты
 report*.html".idea/"
+
 ".idea/" 
+"__pycache__/" 
